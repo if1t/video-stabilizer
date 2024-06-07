@@ -6,16 +6,19 @@ from scipy import signal
 
 
 class FrameStabilizer:
-    def stabilizeFrames(self, path_to_frames_dir):
-        frames = [
+    @staticmethod
+    def get_frames_from_path(path_to_frames):
+        return [
             cv2.imread(path_to_frame)
-            for path_to_frame in sorted(glob.glob(f"{path_to_frames_dir}/*"))
+            for path_to_frame in sorted(glob.glob(f"{path_to_frames}/*"))
         ]
 
-        stabilized_frames = [frames[0]]
+    @staticmethod
+    def stabilizeFrames(primary_frame, frames):
+        stabilized_frames = []
 
-        for current_frame in frames[1:]:
-            stabilized_frame = self.stabilize(frames[0], current_frame)
+        for current_frame in frames:
+            stabilized_frame = FrameStabilizer.stabilize(primary_frame, current_frame)
             stabilized_frames.append(stabilized_frame)
 
         return stabilized_frames
@@ -27,7 +30,8 @@ class FrameStabilizer:
         for i, frame in enumerate(stabilized_frames):
             cv2.imwrite(f"{output_dir}/frame_{i}.jpg", frame)
 
-    def stabilize(self, primary_frame, current_frame):
+    @staticmethod
+    def stabilize(primary_frame, current_frame):
         # Преобразуем кадры в оттеночные изображения
         gray_previous_frame = cv2.cvtColor(primary_frame, cv2.COLOR_BGR2GRAY)
         gray_current_frame = cv2.cvtColor(current_frame, cv2.COLOR_BGR2GRAY)
